@@ -1,12 +1,11 @@
-const readline = require('readline');
+const readline = require('readline')
 
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout
-});
+})
 
-// Perguntas para obter informações sobre o projeto
-const perguntas = [
+const perguntasCriacao = [
   "Qual a complexidade do projeto (1-10)? ",
   "Quantas seções a landing page terá? ",
   "A landing page necessitará de integração de mapas (1 para sim, 0 para não)? ",
@@ -18,44 +17,49 @@ const perguntas = [
   "A landing page necessitará de ferramentas de agendamento (1 para sim, 0 para não)? ",
   "A landing page necessitará de vídeos/conteúdo multimídia (1 para sim, 0 para não)? ",
   "A landing page necessitará de recursos de acessibilidade (1 para sim, 0 para não)? "
-];
+]
 
-let respostas = [];
+const perguntasAtualizacao = [
+  "Quantas imagens você deseja atualizar? ",
+  "Quantos textos você deseja atualizar? ",
+  "Quantos recursos especiais você deseja atualizar? "
+]
 
-// Função para calcular o tempo estimado baseado nas respostas
-const calcularTempoEstimado = (respostas) => {
-  const [complexidade, secoes, ...recursosEspeciais] = respostas.map(Number);
-  const fatorComplexidade = complexidade * 3; // Ajuste no fator de complexidade
-  const fatorSecoes = secoes * 4; // Ajuste no fator de seções
-  
-  // Calcula o tempo adicional necessário para cada recurso especial
-  const fatorRecursosEspeciais = recursosEspeciais.reduce((acc, recurso) => acc + (recurso === 1 ? 5 : 0), 0);
-  
-  // Calcula o tempo total em horas
-  const tempoTotalHoras = fatorComplexidade + fatorSecoes + fatorRecursosEspeciais;
-  
-  // Calcula a margem de erro baseada na complexidade (0% a 50%)
-  const margemErro = (complexidade / 10) * 0.5;
-  const tempoComMargemErro = tempoTotalHoras * (1 + margemErro);
-  
-  // Converte para dias úteis de 5.5 horas de codificação efetiva
-  const diasUteis = Math.ceil(tempoComMargemErro / 5.5) + 5;
-  
-  return diasUteis;
-};
+let respostas = []
 
-const fazerPergunta = (indice) => {
+const calcularTempoEstimadoAtualizacao = (respostas) => {
+  const [imagens, textos, recursosEspeciais] = respostas.map(Number)
+  
+  let tempoTotalHoras = imagens * 0.1
+  tempoTotalHoras += textos * 1
+  tempoTotalHoras += recursosEspeciais * 5
+
+  const diasUteis = Math.ceil(tempoTotalHoras / 5.5) + 1
+  
+  return diasUteis
+}
+
+const fazerPergunta = (indice, tipo) => {
+  const perguntas = tipo === 'criar' ? perguntasCriacao : perguntasAtualizacao
+
   if (indice >= perguntas.length) {
-    const diasUteis = calcularTempoEstimado(respostas);
-    console.log(`O tempo estimado para a criação da landing page é de aproximadamente ${diasUteis} dias úteis.`);
-    rl.close();
-    return;
+    const diasUteis = tipo === 'criar' ? calcularTempoEstimado(respostas) : calcularTempoEstimadoAtualizacao(respostas)
+    console.log(`O tempo estimado é de aproximadamente ${diasUteis} dias úteis.`)
+    rl.close()
+    return
   }
 
   rl.question(perguntas[indice], (resposta) => {
-    respostas.push(resposta);
-    fazerPergunta(indice + 1);
-  });
-};
+    respostas.push(resposta)
+    fazerPergunta(indice + 1, tipo)
+  })
+}
 
-fazerPergunta(0);
+rl.question("Você deseja criar uma nova landing page ou atualizar uma existente? (criar/att) ", (tipo) => {
+  if (tipo === "criar" || tipo === "att") {
+    fazerPergunta(0, tipo)
+  } else {
+    console.log("Opção inválida.")
+    rl.close()
+  }
+})
