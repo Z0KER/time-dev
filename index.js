@@ -44,7 +44,7 @@ const calcularTempoEstimado = (respostas) => {
   const fatorComplexidade = complexidade * 3
   const fatorSecoes = secoes * 4
 
-  const fatorRecursosEspeciais = recursosEspeciais.reduce((acc, recurso) => acc + (recurso === 1 ? 5 : 0), 0)
+  const fatorRecursosEspeciais = recursosEspeciais.reduce((acc, recurso) => acc + (recurso === 1 ? 3 : 0), 0)
 
   const tempoTotalHoras = fatorComplexidade + fatorSecoes + fatorRecursosEspeciais
 
