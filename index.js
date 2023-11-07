@@ -39,6 +39,23 @@ const calcularTempoEstimadoAtualizacao = (respostas) => {
   return diasUteis
 }
 
+const calcularTempoEstimado = (respostas) => {
+  const [complexidade, secoes, ...recursosEspeciais] = respostas.map(Number)
+  const fatorComplexidade = complexidade * 3
+  const fatorSecoes = secoes * 4
+
+  const fatorRecursosEspeciais = recursosEspeciais.reduce((acc, recurso) => acc + (recurso === 1 ? 5 : 0), 0)
+
+  const tempoTotalHoras = fatorComplexidade + fatorSecoes + fatorRecursosEspeciais
+
+  const margemErro = (complexidade / 10) * 0.5
+  const tempoComMargemErro = tempoTotalHoras * (1 + margemErro)
+
+  const diasUteis = Math.ceil(tempoComMargemErro / 5.5) + 5
+
+  return diasUteis
+}
+
 const fazerPergunta = (indice, tipo) => {
   const perguntas = tipo === 'criar' ? perguntasCriacao : perguntasAtualizacao
 
